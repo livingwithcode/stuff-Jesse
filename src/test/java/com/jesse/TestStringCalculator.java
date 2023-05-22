@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing String Calculator.
@@ -55,5 +56,13 @@ class TestStringCalculator {
     assertEquals(0,stringCalculator.add(";\n1;2"));
     assertEquals(3,stringCalculator.add(";\n1\n2"));
     assertEquals(3,stringCalculator.add(";\n1,2"));
+  }
+
+  @Test
+  void testNegative() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> stringCalculator.add("1,-1"));
+    assertTrue(exception.getMessage().contains("Negative numbers are not allowed [-1]"));
+    exception = assertThrows(IllegalArgumentException.class, () -> stringCalculator.add("1,-1,-2"));
+    assertTrue(exception.getMessage().contains("Negative numbers are not allowed [-1,-2]"));
   }
 }
