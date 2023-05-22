@@ -77,4 +77,11 @@ class TestStringCalculator {
     assertEquals(6, stringCalculator.add("//[abc]\n1abc2abc3"));
     assertEquals(6, stringCalculator.add("//[;:]\n1;:2;:3"));
   }
+
+  @Test
+  void testMultiDelimiters(){
+    assertEquals(6,stringCalculator.add("//[*][%]\n1*2%3"));
+    assertEquals(6,stringCalculator.add("//[**][%%]\n1**2%%3"));
+    assertEquals(15,stringCalculator.add("//[**][%%]\n1**2%%3,4\n5"));
+  }
 }
