@@ -36,6 +36,11 @@ public class StringCalculator {
    */
   private static final String CHECK_INPUT = ".*(\n,|,\n).*";
 
+  /**
+   * max number
+   */
+  private static final int MAX_NUMBER = 1000;
+
   private final Logger logger = LogManager.getLogger(StringCalculator.class);
 
   public int add(String numbers) {
@@ -72,7 +77,7 @@ public class StringCalculator {
       throw new IllegalArgumentException(String.format("Negative numbers are not allowed [%s]", negativeNumbers));
     }
 
-    return numberList.stream().reduce(0, Integer::sum);
+    return numberList.stream().filter(num -> num < MAX_NUMBER).reduce(0, Integer::sum);
   }
 
   private Optional<String> getDelimiter(String numbers) {

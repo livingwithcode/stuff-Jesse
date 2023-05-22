@@ -65,4 +65,9 @@ class TestStringCalculator {
     exception = assertThrows(IllegalArgumentException.class, () -> stringCalculator.add("1,-1,-2"));
     assertTrue(exception.getMessage().contains("Negative numbers are not allowed [-1,-2]"));
   }
+
+  @Test
+  void testMaxNumber(){
+    assertEquals(1001, stringCalculator.add("1000,9000,999,2"));
+  }
 }
