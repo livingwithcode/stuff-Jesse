@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -40,6 +42,11 @@ public class StringCalculator {
    * max number
    */
   private static final int MAX_NUMBER = 1000;
+
+  /**
+   * Delimiter regex
+   */
+  private final Pattern pattern = Pattern.compile("//\\[([\\D]+)]\n");
 
   private final Logger logger = LogManager.getLogger(StringCalculator.class);
 
@@ -72,7 +79,7 @@ public class StringCalculator {
                                        return number;
                                      }).collect(toList());
     String negativeNumbers = numberList.stream().filter(num -> num < 0)
-                                         .map(String::valueOf).collect(Collectors.joining(DEFAULT_DELIMITER));
+                                       .map(String::valueOf).collect(Collectors.joining(DEFAULT_DELIMITER));
     if (negativeNumbers.length() > 0) {
       throw new IllegalArgumentException(String.format("Negative numbers are not allowed [%s]", negativeNumbers));
     }
@@ -81,13 +88,12 @@ public class StringCalculator {
   }
 
   private Optional<String> getDelimiter(String numbers) {
-    if (null == numbers || !numbers.contains(NEWLINE)) {
+    if (null == numbers) {
       return Optional.empty();
     }
-    String[] split = numbers.strip().split(NEWLINE);
-    String delimiterLine = split[0];
-    if (delimiterLine.startsWith("//") && delimiterLine.length() > 2) {
-      return Optional.of(delimiterLine.substring(2));
+    Matcher matcher = pattern.matcher(numbers.strip());
+    if (matcher.find()) {
+      return Optional.of(matcher.group(1));
     }
     return Optional.empty();
   }

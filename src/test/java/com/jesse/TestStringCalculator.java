@@ -50,9 +50,9 @@ class TestStringCalculator {
   @Test
   void testCustomDelimiter(){
     // we suppose the delimiter line is start with // and end with new line \n
-    assertEquals(3,stringCalculator.add("//;\n1;2"));
-    assertEquals(3,stringCalculator.add("//;\n1,2"));
-    assertEquals(3,stringCalculator.add("//;\n1\n2"));
+    assertEquals(3,stringCalculator.add("//[;]\n1;2"));
+    assertEquals(3,stringCalculator.add("//[;]\n1,2"));
+    assertEquals(3,stringCalculator.add("//[;]\n1\n2"));
     assertEquals(0,stringCalculator.add(";\n1;2"));
     assertEquals(3,stringCalculator.add(";\n1\n2"));
     assertEquals(3,stringCalculator.add(";\n1,2"));
@@ -69,5 +69,12 @@ class TestStringCalculator {
   @Test
   void testMaxNumber(){
     assertEquals(1001, stringCalculator.add("1000,9000,999,2"));
+  }
+
+  @Test
+  void testAnyLengthOfDelimiters(){
+    assertEquals(6, stringCalculator.add("//[***]\n1***2***3"));
+    assertEquals(6, stringCalculator.add("//[abc]\n1abc2abc3"));
+    assertEquals(6, stringCalculator.add("//[;:]\n1;:2;:3"));
   }
 }
