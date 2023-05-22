@@ -7,14 +7,14 @@
 package com.jesse;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,31 +43,30 @@ public class StringCalculator {
    */
   private static final int MAX_NUMBER = 1000;
 
-  /**
-   * Delimiter regex
-   */
-  private final Pattern pattern = Pattern.compile("//\\[([\\D]+)]\n");
-
   private final Logger logger = LogManager.getLogger(StringCalculator.class);
 
   public int add(String numbers) {
-    if (null == numbers || numbers.replace(DEFAULT_DELIMITER, "").strip().isBlank()) {
+    if (null == numbers || numbers.replace(DEFAULT_DELIMITER, "").isBlank()) {
       return 0;
     }
     if (numbers.matches(CHECK_INPUT)) {
       throw new IllegalArgumentException("one or the other delimiter only, but not two delimiter come together.");
     }
-    Optional<String> delimiter = getDelimiter(numbers);
-    String sanitizedNumberStr;
-    if (delimiter.isPresent()) {
-      sanitizedNumberStr =
-          numbers.substring(numbers.indexOf(NEWLINE) + 1).replace(NEWLINE, ",").replace(delimiter.get(), ",").strip();
+    Set<String> delimiters = new HashSet<>();
+    String sanitizedNumbers = numbers;
+    if (numbers.startsWith("//") && numbers.contains(NEWLINE)) {
+      int startIndex = numbers.indexOf(NEWLINE);
+      delimiters = getDelimiter(numbers.substring(0, startIndex + 1));
+      if (numbers.length() > startIndex + 2) {
+        sanitizedNumbers = numbers.substring(startIndex + 1);
+      }
+      else {
+        return 0;
+      }
     }
-    else {
-      sanitizedNumberStr = numbers.replace(NEWLINE, ",").strip();
-    }
-    List<Integer> numberList = Arrays.stream(sanitizedNumberStr.split(DEFAULT_DELIMITER))
-                                     .filter(Objects::nonNull)
+    delimiters.add(NEWLINE);
+    delimiters.add(DEFAULT_DELIMITER);
+    List<Integer> numberList = Arrays.stream(sanitizedNumbers.split("[" + String.join("", delimiters) + "]"))
                                      .map(num -> {
                                        int number = 0;
                                        try {
@@ -87,14 +86,17 @@ public class StringCalculator {
     return numberList.stream().filter(num -> num < MAX_NUMBER).reduce(0, Integer::sum);
   }
 
-  private Optional<String> getDelimiter(String numbers) {
+  private Set<String> getDelimiter(String numbers) {
     if (null == numbers) {
-      return Optional.empty();
+      return new TreeSet<>();
     }
-    Matcher matcher = pattern.matcher(numbers.strip());
-    if (matcher.find()) {
-      return Optional.of(matcher.group(1));
+    if (numbers.startsWith("//") && numbers.endsWith("\n")) {
+      String delemiters = numbers.substring(2, numbers.indexOf(NEWLINE));
+      if (delemiters.startsWith("[") && delemiters.endsWith("]")) {
+        delemiters = delemiters.substring(1, delemiters.length() - 1);
+        return Arrays.stream(delemiters.split("\\]\\[")).collect(toSet());
+      }
     }
-    return Optional.empty();
+    return new TreeSet<>();
   }
 }
