@@ -8,6 +8,7 @@ package com.jesse;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Testing String Calculator.
@@ -36,5 +37,12 @@ class TestStringCalculator {
     assertEquals(4, stringCalculator.add("0,2,2"));
     assertEquals(4, stringCalculator.add("0,2,2,a,b,c"));
   }
-
+  @Test
+  void testNewLine(){
+    assertEquals(6, stringCalculator.add("1\n2,3"));
+    assertEquals(6, stringCalculator.add("1\n\n2,3"));
+    assertEquals(6, stringCalculator.add("1\n\n2,,3"));
+    assertThrows(IllegalArgumentException.class,()->stringCalculator.add("1,\n2"));
+    assertThrows(IllegalArgumentException.class,()->stringCalculator.add("1\n,3"));
+  }
 }

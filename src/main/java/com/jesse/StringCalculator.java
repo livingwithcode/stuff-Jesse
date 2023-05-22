@@ -18,13 +18,20 @@ import org.apache.logging.log4j.Logger;
 public class StringCalculator {
   private static final String DEFAULT_DELIMITER = ",";
 
+  private static final String NEWLINE = "\n";
+
+  private static final String CHECK_INPUT = ".*(\n,|,\n).*";
+
   private final Logger logger = LogManager.getLogger(StringCalculator.class);
 
   public int add(String numbers) {
     if (null == numbers || numbers.replace(DEFAULT_DELIMITER, "").strip().isBlank()) {
       return 0;
     }
-    String sanitizedNumberStr = numbers.strip();
+    if (numbers.matches(CHECK_INPUT)) {
+      throw new IllegalArgumentException("one or the other delimiter only, but not two delimiter come together.");
+    }
+    String sanitizedNumberStr = numbers.replace(NEWLINE, ",").strip();
 
     return Arrays.stream(sanitizedNumberStr.split(DEFAULT_DELIMITER))
                  .filter(Objects::nonNull)
